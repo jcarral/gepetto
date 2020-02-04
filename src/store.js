@@ -4,7 +4,7 @@ const Credentials = require('./models/Credentials');
 
 
 const getCredentials = () => {
-    return config.get(CONSTANTS.CONFIG_CREDENTIAlS);
+    return config.get(CONSTANTS.CONFIG_CREDENTIAlS).map(cred => new Credentials(cred));
 };
 
 const hasCredentials = () => {
@@ -18,23 +18,30 @@ const addCredentials = data => {
 
     if(cred.isValid()) {
 
-        const oldCredentials = config.get(CONSTANTS.CONFIG_CREDENTIAlS);
+        let oldCredentials = config.get(CONSTANTS.CONFIG_CREDENTIAlS);
 
-        if(!oldCredentials || typeof oldCredentials === typeof []) {
+        if(!oldCredentials || typeof oldCredentials !== typeof []) {
             oldCredentials = [];
         }
 
         oldCredentials.push(cred);
-        config.set(CONSTANTS.CONFIG_CREDENTIAlS, cred);
+        config.set(CONSTANTS.CONFIG_CREDENTIAlS, oldCredentials);
 
     } else {
         throw new Error('Invalid credentials');
     }
 };
 
+const removeCredentials = key => {
+  const credentialsWithoutTarget = getCredentials().filter(cred => cred.displayName !== key);
+  console.log(credentialsWithoutTarget, key)
+  config.set(CONSTANTS.CONFIG_CREDENTIAlS, credentialsWithoutTarget);
+};
+
 
 module.exports = {
     getCredentials,
     hasCredentials,
-    addCredentials
+    addCredentials,
+    removeCredentials
 };
