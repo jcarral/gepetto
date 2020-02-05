@@ -17,5 +17,8 @@ module.exports = {
     CLOSE_OPT: 'close',
     MANAGE_CREDENTIALS_OPT: 'manageCredentials',
     BOARDS_OPT: 'boards'
+  },
+  BOARD: {
+    MAIN: 'selectBoard',
   }
 };

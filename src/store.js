@@ -4,7 +4,8 @@ const Credentials = require('./models/Credentials');
 
 
 const getCredentials = () => {
-    return config.get(CONSTANTS.CONFIG_CREDENTIAlS).map(cred => new Credentials(cred));
+    const storedCredentials = config.get(CONSTANTS.CONFIG_CREDENTIAlS);
+    return (storedCredentials || []).map(cred => new Credentials(cred));
 };
 
 const hasCredentials = () => {

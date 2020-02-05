@@ -8,7 +8,7 @@ const { QuestionConstants } = require('./constants/');
 const { CREDENTIALS, MENU } = QuestionConstants;
 const { hasCredentials, addCredentials, getCredentials, removeCredentials } = require('./store');
 const { Action, Credentials } = require('./models/');
-const { ManageCredentials, MenuQuestions } = require('./questions');
+const { ManageCredentials, MenuQuestions, BoardQuestions } = require('./questions');
 
 const checkForUpdates = () => {
 
@@ -57,6 +57,19 @@ const printHeader = () => {
     );
 };
 
+const printBoardMenu = async () => {
+  const selectBoardAction = new Action(BoardQuestions.Main);
+  const storedCredentials = getCredentials();
+  const choices = storedCredentials.map(cred => ({
+    name: cred.displayName,
+    value: cred.board
+  }));
+  selectBoardAction.setChoices(BoardQuestions.Main, choices);
+  const res = await selectBoardAction.ask();
+  console.log(res);
+};
+
+
 const printMainMenu = async () => {
   printHeader();
   const menuAction = new Action(MenuQuestions.Main)
@@ -64,10 +77,11 @@ const printMainMenu = async () => {
 
   switch (menuActionAnswer[MENU.NAME]) {
     case MENU.MANAGE_CREDENTIALS_OPT:
-      await printManageCredentialsMenu();
-      break;
+      return await printManageCredentialsMenu();
+    case MENU.BOARDS_OPT:
+      return await printBoardMenu();
     case MENU.CLOSE_OPT:
-      process.exit(1);
+      return process.exit(1);
     default:
       break;
   }

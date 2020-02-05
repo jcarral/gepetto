@@ -16,7 +16,7 @@ const Main = [{
     },
     {
       name: 'Select board',
-      disabled: 'Unavailable at this time',
+      //disabled: 'Unavailable at this time',
       value: MENU.BOARDS_OPT
     },
     {
