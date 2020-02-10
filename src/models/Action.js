@@ -1,4 +1,5 @@
 const inquirer = require('inquirer');
+inquirer.registerPrompt('datetime', require('inquirer-datepicker-prompt'))
 
 const validationFn = message => value => {
     if (!message || !message.length || value.length) {
@@ -37,6 +38,10 @@ class Action {
     this.questions = tmpQuestions;
   }
 
+  removeQuestion(questionKey) {
+    let tmpQuestions = this.questions.filter(q => q.name !== questionKey);
+    this.questions = tmpQuestions;
+  }
 }
 
 module.exports = Action;

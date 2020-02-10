@@ -5,10 +5,13 @@
   "description": "Jira worklog cli",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\""
   },
   "author": "Joseba Carral <jcarraldc@gmail.com>",
   "license": "MIT",
+  "bin": {
+    "gepetto": "./src/index.js"
+  },
   "dependencies": {
     "chalk": "^3.0.0",
     "clear": "^0.1.0",
@@ -16,6 +19,7 @@
     "configstore": "^5.0.0",
     "figlet": "^1.2.4",
     "inquirer": "^7.0.4",
+    "inquirer-datepicker-prompt": "^0.4.2",
     "jest": "^25.1.0",
     "jira-simple": "0.0.1",
     "minimist": "^1.2.0",

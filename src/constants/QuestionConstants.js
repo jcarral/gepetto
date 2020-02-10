@@ -20,5 +20,14 @@ module.exports = {
   },
   BOARD: {
     MAIN: 'selectBoard',
+    LOADED_BOARD: 'loadedBoard',
+    VIEW_USERS: 'viewUsers',
+    VIEW_ISSUES: 'viewIssues',
+    VIEW_LOGS: 'viewLogs',
+    REFRESH_BOARD: 'refreshBoard',
+    BACK: 'back',
+    AUTHOR: 'worklogAuthor',
+    START_DATE: 'first',
+    END_DATE: 'last',
   }
 };

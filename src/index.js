@@ -1,9 +1,8 @@
+#!/usr/bin/env node
+
 const chalk = require('chalk');
 const clear = require('clear');
 const figlet = require('figlet');
-const {
-  Spinner
-} = require('clui');
 
 const {
   QuestionConstants
@@ -38,10 +37,34 @@ const printHeader = () => {
   );
 };
 
-const printBoardMenu = async () => {
-  let selectedBoard = await JiraService.askToSelectBoard();
-  selectedBoard = await JiraService.loadBoard(selectedBoard);
-  
+const printBoardMenu = async selectedBoard => {
+  const loadedBoardAction = new Action(BoardQuestions.LoadedBoard);
+  const loadedBoardActionAnswer = await loadedBoardAction.ask();
+//
+  switch (loadedBoardActionAnswer[BOARD.LOADED_BOARD]) {
+    case BOARD.VIEW_USERS:
+      JiraService.showBoardUsers(selectedBoard);
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.REFRESH_BOARD:
+      selectedBoard = await JiraService.refreshBoard(selectedBoard);
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.VIEW_ISSUES:
+      const issues = await JiraService.askForIssues(selectedBoard);
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.VIEW_LOGS:
+      const logs = await JiraService.askForLogs(selectedBoard);
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.BACK:
+      await printMainMenu(true);
+      break;
+    default:
+      break;
+  }
+
 };
 const printManageCredentialsMenu = async (hideHeader) => {
 
@@ -83,7 +106,8 @@ const printMainMenu = async () => {
     case MENU.MANAGE_CREDENTIALS_OPT:
       return await printManageCredentialsMenu();
     case MENU.BOARDS_OPT:
-      return await printBoardMenu();
+      const selectedBoard = await JiraService.loadBoard();
+      return await printBoardMenu(selectedBoard);
     case MENU.CLOSE_OPT:
       return process.exit(1);
     default:
