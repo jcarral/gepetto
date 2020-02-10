@@ -24,7 +24,11 @@ const {
   CredentialsQuestions
 } = require('./questions');
 
-const { CredentialsService, JiraService, } = require('./services');
+const { CredentialsService, JiraService, ExportService, } = require('./services');
+
+
+global.__basedir = __dirname + "/..";
+
 
 const printHeader = () => {
   clear();
@@ -52,6 +56,7 @@ const printBoardMenu = async selectedBoard => {
       break;
     case BOARD.VIEW_ISSUES:
       const issues = await JiraService.askForIssues(selectedBoard);
+      await ExportService.exportIssues(issues, 'xlsx');
       await printBoardMenu(selectedBoard);
       break;
     case BOARD.VIEW_LOGS:

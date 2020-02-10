@@ -110,14 +110,14 @@ const askForIssues = async board => {
 
   const answer = await doAskForBoardIssues(board);
   const issues = board.getIssues(answer);
-
+  return issues;
 
 };
 
 const askForLogs = async board => {
   const answer = await doAskForBoardIssues(board);
   const logs = board.getLogs(answer);
-
+  return logs;
 }
 
 
