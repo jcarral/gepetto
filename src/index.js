@@ -1,75 +1,79 @@
 const chalk = require('chalk');
 const clear = require('clear');
 const figlet = require('figlet');
-const inquirer = require('inquirer');
-const { Spinner } = require('clui');
+const {
+  Spinner
+} = require('clui');
 
-const { QuestionConstants } = require('./constants/');
-const { CREDENTIALS, MENU } = QuestionConstants;
-const { hasCredentials, addCredentials, getCredentials, removeCredentials } = require('./store');
-const { Action, Credentials } = require('./models/');
-const { ManageCredentials, MenuQuestions, BoardQuestions } = require('./questions');
+const {
+  QuestionConstants
+} = require('./constants/');
+const {
+  CREDENTIALS,
+  MENU,
+  BOARD
+} = QuestionConstants;
 
-const checkForUpdates = () => {
+const {
+  Action,
+  Credentials
+} = require('./models/');
 
-};
+const {
+  MenuQuestions,
+  BoardQuestions,
+  CredentialsQuestions
+} = require('./questions');
 
-const askForCredentials = async () => {
-
-  const askForCredentialsAction = new Action(ManageCredentials.AddCredentials);
-  const answerCred = await askForCredentialsAction.ask();
-  const cred = new Credentials(answerCred);
-
-  if(cred.isValid()){
-    addCredentials(cred);
-  }
-
-};
-
-const askToDeleteCredentials = async () => {
-  const storedCredentials = getCredentials();
-
-  const choices = storedCredentials.map(cred => ({
-    name: cred.displayName,
-    value: cred.displayName
-  }));
-
-  const askToDeleteAction = new Action(ManageCredentials.DeleteCredentials);
-  askToDeleteAction.setChoices(CREDENTIALS.DELETE, choices);
-  const answerCred = await askToDeleteAction.ask();
-  const credToRemove = answerCred[CREDENTIALS.DELETE];
-
-  if(credToRemove.length) {
-    credToRemove.forEach(cred => removeCredentials(cred));
-  }
-
-};
-
+const { CredentialsService, JiraService, } = require('./services');
 
 const printHeader = () => {
-    clear();
-    console.log(
-        chalk.hex('#E4007C').bold(
-            figlet.textSync('GePetto', {
-                horizontalLayout: 'full'
-            })
-        )
-    );
+  clear();
+  console.log(
+    chalk.hex('#E4007C').bold(
+      figlet.textSync('GePetto', {
+        horizontalLayout: 'full'
+      })
+    )
+  );
 };
 
 const printBoardMenu = async () => {
-  const selectBoardAction = new Action(BoardQuestions.Main);
-  const storedCredentials = getCredentials();
-  const choices = storedCredentials.map(cred => ({
-    name: cred.displayName,
-    value: cred.board
-  }));
-  selectBoardAction.setChoices(BoardQuestions.Main, choices);
-  const res = await selectBoardAction.ask();
-  console.log(res);
+  let selectedBoard = await JiraService.askToSelectBoard();
+  selectedBoard = await JiraService.loadBoard(selectedBoard);
+  
 };
+const printManageCredentialsMenu = async (hideHeader) => {
 
+  if (!hideHeader) {
+    printHeader();
+  }
 
+  const manageCredentialsAction = new Action(CredentialsQuestions.ManageCredentialsQuestions);
+  const manageCredentialsAnswer = await manageCredentialsAction.ask();
+
+  switch (manageCredentialsAnswer[CREDENTIALS.MANAGE_CREDENTIALS]) {
+
+    case CREDENTIALS.VIEW_CREDENTIALS_OPT:
+      CredentialsService.viewAllCredentials();
+      await printManageCredentialsMenu(true);
+      break;
+    case CREDENTIALS.ADD_CREDENTIALS_OPT:
+      await CredentialsService.askForCredentials();
+      await printManageCredentialsMenu();
+      break;
+    case CREDENTIALS.DELETE_CREDENTIALS_OPT:
+      await CredentialsService.askToDeleteCredentials();
+      await printManageCredentialsMenu();
+      break;
+    case CREDENTIALS.BACK_OPT:
+      await printMainMenu();
+      break;
+    default:
+      break;
+  }
+
+};
 const printMainMenu = async () => {
   printHeader();
   const menuAction = new Action(MenuQuestions.Main)
@@ -83,53 +87,24 @@ const printMainMenu = async () => {
     case MENU.CLOSE_OPT:
       return process.exit(1);
     default:
-      break;
+      return;
   }
 };
 
-const printManageCredentialsMenu = async (hideHeader) => {
 
-  if(!hideHeader){
-    printHeader();
-  }
-
-  const manageCredentialsAction = new Action(ManageCredentials.ManageCredentials);
-  const manageCredentialsAnswer = await manageCredentialsAction.ask();
-
-  switch (manageCredentialsAnswer[CREDENTIALS.MANAGE_CREDENTIALS]) {
-
-    case CREDENTIALS.VIEW_CREDENTIALS_OPT:
-      const userCredentials = getCredentials();
-      userCredentials.forEach(cred => cred.print());
-      await printManageCredentialsMenu(true);
-      break;
-    case CREDENTIALS.ADD_CREDENTIALS_OPT:
-      await askForCredentials();
-      await printManageCredentialsMenu();
-      break;
-    case CREDENTIALS.DELETE_CREDENTIALS_OPT:
-      await askToDeleteCredentials();
-      await printManageCredentialsMenu();
-    case CREDENTIALS.BACK_OPT:
-        await printMainMenu();
-        break;
-    default:
-      break;
-  }
-
-};
 
 
 (async () => {
 
-    printHeader();
+  printHeader();
 
-    if(!hasCredentials()) {
-        await askForCredentials();
-    }
 
-    await printMainMenu();
+  //await checkForUpdates();
+
+  if (!CredentialsService.hasCredentials()) {
+    await CredentialsService.askForCredentials();
+  }
+
+  await printMainMenu();
 
 })();
-
-
