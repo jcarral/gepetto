@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+//Set global basedir variable
+global.__basedir = __dirname + "/..";
+
 const {
   QuestionConstants
 } = require('./constants/');
@@ -19,11 +23,9 @@ const {
   CredentialsQuestions
 } = require('./questions');
 
-const { CredentialsService, JiraService, ExportService, } = require('./services');
+const { CredentialsService, JiraService, ExportService, UpdatesService, } = require('./services');
 const { printHeader } = require('./helpers');
 
-//Set global basedir variable
-global.__basedir = __dirname + "/..";
 
 const printBoardMenu = async selectedBoard => {
   const loadedBoardAction = new Action(BoardQuestions.LoadedBoard);
@@ -87,8 +89,10 @@ const printManageCredentialsMenu = async (hideHeader) => {
   }
 
 };
-const printMainMenu = async () => {
-  printHeader();
+const printMainMenu = async (hideHeader) => {
+  if(!hideHeader){
+    printHeader();
+  }
   const menuAction = new Action(MenuQuestions.Main)
   const menuActionAnswer = await menuAction.ask();
 
@@ -112,12 +116,12 @@ const printMainMenu = async () => {
 
   printHeader();
 
-  //await checkForUpdates();
+  await UpdatesService.checkForUpdates();
 
   if (!CredentialsService.hasCredentials()) {
     await CredentialsService.askForCredentials();
   }
 
-  await printMainMenu();
+  await printMainMenu(true);
 
 })();
