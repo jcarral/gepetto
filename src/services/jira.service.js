@@ -98,7 +98,7 @@ const doAskForBoardIssues = async board => {
 
 
   let answer = await askIssuesAction.ask();
-  if (answer[BOARD.AUTHOR] && !answer[BOARD.AUTHOR].length) {
+  if (!answer[BOARD.AUTHOR] || !answer[BOARD.AUTHOR].length) {
     delete answer[BOARD.AUTHOR];
   }
   answer.first = answer.first.toISOString().split('T')[0];
