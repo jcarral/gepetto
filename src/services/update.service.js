@@ -69,9 +69,13 @@ const requiresAnUpdate = async (version) => {
 
 }
 
+const checkForUpdates = async () => {
+
+};
 
 module.exports = {
     getVersions,
     requiresAnUpdate,
-    hasExpired
+    hasExpired,
+    checkForUpdates,
 };

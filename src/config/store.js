@@ -1,5 +1,4 @@
 const Configstore = require('configstore');
-const CONSTANTS = require('./constants');
 
 const config = new Configstore('ds');
 

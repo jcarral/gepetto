@@ -1,43 +1,123 @@
-const chalk = require('chalk');
-const clear = require('clear');
-const figlet = require('figlet');
-const inquirer = require('inquirer');
+#!/usr/bin/env node
+const {
+  QuestionConstants
+} = require('./constants/');
+const {
+  CREDENTIALS,
+  MENU,
+  BOARD
+} = QuestionConstants;
 
+const {
+  Action,
+  Credentials
+} = require('./models/');
 
-const { hasCredentials } = require('./store');
+const {
+  MenuQuestions,
+  BoardQuestions,
+  CredentialsQuestions
+} = require('./questions');
 
-const checkForUpdates = () => {
+const { CredentialsService, JiraService, ExportService, } = require('./services');
+const { printHeader } = require('./helpers');
+
+//Set global basedir variable
+global.__basedir = __dirname + "/..";
+
+const printBoardMenu = async selectedBoard => {
+  const loadedBoardAction = new Action(BoardQuestions.LoadedBoard);
+  const loadedBoardActionAnswer = await loadedBoardAction.ask();
+//
+  switch (loadedBoardActionAnswer[BOARD.LOADED_BOARD]) {
+    case BOARD.VIEW_USERS:
+      JiraService.showBoardUsers(selectedBoard);
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.REFRESH_BOARD:
+      selectedBoard = await JiraService.refreshBoard(selectedBoard);
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.VIEW_ISSUES:
+      const issues = await JiraService.askForIssues(selectedBoard);
+      await ExportService.exportIssues(issues, 'xlsx');
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.VIEW_LOGS:
+      const logs = await JiraService.askForLogs(selectedBoard);
+      await ExportService.exportLogs(logs, 'xlsx');
+      await printBoardMenu(selectedBoard);
+      break;
+    case BOARD.BACK:
+      await printMainMenu(true);
+      break;
+    default:
+      break;
+  }
 
 };
+const printManageCredentialsMenu = async (hideHeader) => {
 
-const askForCredentials = async () => {
-
-
-};
-
-
-const printHeader = () => {
-    clear();
-    console.log(
-        chalk.yellow(
-            figlet.textSync('GePetto', {
-                font: 'Alligator',
-                horizontalLayout: 'full'
-            })
-        )
-    );
-};
-
-
-
-(async () => {
+  if (!hideHeader) {
     printHeader();
+  }
+
+  const manageCredentialsAction = new Action(CredentialsQuestions.ManageCredentialsQuestions);
+  const manageCredentialsAnswer = await manageCredentialsAction.ask();
+
+  switch (manageCredentialsAnswer[CREDENTIALS.MANAGE_CREDENTIALS]) {
+
+    case CREDENTIALS.VIEW_CREDENTIALS_OPT:
+      CredentialsService.viewAllCredentials();
+      await printManageCredentialsMenu(true);
+      break;
+    case CREDENTIALS.ADD_CREDENTIALS_OPT:
+      await CredentialsService.askForCredentials();
+      await printManageCredentialsMenu();
+      break;
+    case CREDENTIALS.DELETE_CREDENTIALS_OPT:
+      await CredentialsService.askToDeleteCredentials();
+      await printManageCredentialsMenu();
+      break;
+    case CREDENTIALS.BACK_OPT:
+      await printMainMenu();
+      break;
+    default:
+      break;
+  }
+
+};
+const printMainMenu = async () => {
+  printHeader();
+  const menuAction = new Action(MenuQuestions.Main)
+  const menuActionAnswer = await menuAction.ask();
+
+  switch (menuActionAnswer[MENU.NAME]) {
+    case MENU.MANAGE_CREDENTIALS_OPT:
+      return await printManageCredentialsMenu();
+    case MENU.BOARDS_OPT:
+      const selectedBoard = await JiraService.loadBoard();
+      return await printBoardMenu(selectedBoard);
+    case MENU.CLOSE_OPT:
+      return process.exit(1);
+    default:
+      return;
+  }
+};
 
 
-    if(!hasCredentials()) {
-        await askForCredentials();
-    }
+
+//Init
+(async () => {
+
+  printHeader();
+
+  //await checkForUpdates();
+
+  if (!CredentialsService.hasCredentials()) {
+    await CredentialsService.askForCredentials();
+  }
+
+  await printMainMenu();
 
 })();
-
-
