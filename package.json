@@ -15,6 +15,7 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "clear": "^0.1.0",
+    "cli-box": "^6.0.9",
     "clui": "^0.3.6",
     "configstore": "^5.0.0",
     "exceljs": "^3.7.0",

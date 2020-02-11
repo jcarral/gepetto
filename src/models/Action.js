@@ -11,7 +11,7 @@ const validationFn = message => value => {
 
 class Action {
 
-  constructor(questions) {
+  constructor(questions = []) {
     this.answers = {};
     this.questions = questions.map(q => {
       const currentValidateFn = validationFn(q.validateMessage);

@@ -1,9 +1,4 @@
 #!/usr/bin/env node
-
-const chalk = require('chalk');
-const clear = require('clear');
-const figlet = require('figlet');
-
 const {
   QuestionConstants
 } = require('./constants/');
@@ -25,21 +20,10 @@ const {
 } = require('./questions');
 
 const { CredentialsService, JiraService, ExportService, } = require('./services');
+const { printHeader } = require('./helpers');
 
-
+//Set global basedir variable
 global.__basedir = __dirname + "/..";
-
-
-const printHeader = () => {
-  clear();
-  console.log(
-    chalk.hex('#E4007C').bold(
-      figlet.textSync('GePetto', {
-        horizontalLayout: 'full'
-      })
-    )
-  );
-};
 
 const printBoardMenu = async selectedBoard => {
   const loadedBoardAction = new Action(BoardQuestions.LoadedBoard);
@@ -61,6 +45,7 @@ const printBoardMenu = async selectedBoard => {
       break;
     case BOARD.VIEW_LOGS:
       const logs = await JiraService.askForLogs(selectedBoard);
+      await ExportService.exportLogs(logs, 'xlsx');
       await printBoardMenu(selectedBoard);
       break;
     case BOARD.BACK:
@@ -122,11 +107,10 @@ const printMainMenu = async () => {
 
 
 
-
+//Init
 (async () => {
 
   printHeader();
-
 
   //await checkForUpdates();
 
