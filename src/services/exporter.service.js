@@ -5,7 +5,7 @@ const path = require('path');
 const Box = require("cli-box");
 const chalk = require('chalk');
 
-const { printHeader } = require('../helpers');
+const { printHeader, logger } = require('../helpers');
 
 
 const ISSUE_COLUMNS = [{
@@ -61,12 +61,13 @@ const drawSuccessBox = () => {
     hAlign: "center"
   });
   console.log(chalk.green(boxToDraw));
+
 };
 
 //TODO: Move to logs/Report service
 const drawErrorCreating = err => {
   printHeader();
-  console.error(err);
+  logger.error(err);
   const boxToDraw = Box("35x2", {
     text: "👺 Error creating your report 👺 ",
     stretch: true,
@@ -75,6 +76,7 @@ const drawErrorCreating = err => {
     hAlign: "center"
   });
   console.log(chalk.red(boxToDraw));
+
 }
 
 
@@ -90,6 +92,7 @@ const createFileFromWb = async (wb, fileName, type = 'xlsx') => {
   const fullPathFile = path.join(fileDirPath, `${fileName}.${type}`)
 
   await wb.xlsx.writeFile(fullPathFile);
+  logger.info(`File created at: ${fullPathFile}`);
   return fullPathFile;
 };
 

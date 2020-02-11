@@ -24,13 +24,14 @@ const {
 } = require('./questions');
 
 const { CredentialsService, JiraService, ExportService, UpdatesService, } = require('./services');
-const { printHeader } = require('./helpers');
+const { printHeader, logger } = require('./helpers');
 
 
 const printBoardMenu = async selectedBoard => {
   const loadedBoardAction = new Action(BoardQuestions.LoadedBoard);
   const loadedBoardActionAnswer = await loadedBoardAction.ask();
-//
+
+  logger.info(`[BOARD] User selected: ${JSON.stringify(loadedBoardActionAnswer)}`)
   switch (loadedBoardActionAnswer[BOARD.LOADED_BOARD]) {
     case BOARD.VIEW_USERS:
       JiraService.showBoardUsers(selectedBoard);
@@ -67,6 +68,7 @@ const printManageCredentialsMenu = async (hideHeader) => {
   const manageCredentialsAction = new Action(CredentialsQuestions.ManageCredentialsQuestions);
   const manageCredentialsAnswer = await manageCredentialsAction.ask();
 
+  logger.info(`[CREDENTIALS] User selected: ${JSON.stringify(manageCredentialsAnswer)}`);
   switch (manageCredentialsAnswer[CREDENTIALS.MANAGE_CREDENTIALS]) {
 
     case CREDENTIALS.VIEW_CREDENTIALS_OPT:
@@ -90,12 +92,14 @@ const printManageCredentialsMenu = async (hideHeader) => {
 
 };
 const printMainMenu = async (hideHeader) => {
+
   if(!hideHeader){
     printHeader();
   }
   const menuAction = new Action(MenuQuestions.Main)
   const menuActionAnswer = await menuAction.ask();
 
+  logger.info(`[MAIN] User selected: ${JSON.stringify(menuActionAnswer)}`)
   switch (menuActionAnswer[MENU.NAME]) {
     case MENU.MANAGE_CREDENTIALS_OPT:
       return await printManageCredentialsMenu();
@@ -103,6 +107,7 @@ const printMainMenu = async (hideHeader) => {
       const selectedBoard = await JiraService.loadBoard();
       return await printBoardMenu(selectedBoard);
     case MENU.CLOSE_OPT:
+      logger.info('Closing manually');
       return process.exit(1);
     default:
       return;
@@ -113,15 +118,22 @@ const printMainMenu = async (hideHeader) => {
 
 //Init
 (async () => {
+  try {
+    printHeader();
+    logger.info('Starting GePetto');
+    await UpdatesService.checkForUpdates();
 
-  printHeader();
+    logger.info('Updates checked!');
 
-  await UpdatesService.checkForUpdates();
+    if (!CredentialsService.hasCredentials()) {
+      logger.info('User first login');
+      await CredentialsService.askForCredentials();
+    }
 
-  if (!CredentialsService.hasCredentials()) {
-    await CredentialsService.askForCredentials();
+    await printMainMenu(true);
+  } catch(e) {
+    logger.error(e);
   }
 
-  await printMainMenu(true);
 
 })();

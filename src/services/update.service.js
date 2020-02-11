@@ -55,7 +55,7 @@ const remoteVersion = await getRemoteVersion();
 
     return {
         currentVersion,
-        remoteVersion: 'v0.1.2',
+        remoteVersion,
     };
 
 };

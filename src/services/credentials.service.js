@@ -17,6 +17,7 @@ const {
 const {
   CREDENTIALS
 } = QuestionConstants;
+const { logger } = require('../helpers');
 
 const askForCredentials = async () => {
 
@@ -25,6 +26,7 @@ const askForCredentials = async () => {
   const cred = new Credentials(answerCred);
 
   if (cred.isValid()) {
+    logger.warn(`Invalid credentials ${cred}`);
     addCredentials(cred);
   }
 };
@@ -32,6 +34,7 @@ const askForCredentials = async () => {
 //TODO: Check if is empty and force user to add or close app
 //TODO: After deleting credentials check again if is empty
 const askToDeleteCredentials = async () => {
+
   const storedCredentials = getCredentials();
 
   const choices = storedCredentials.map(cred => ({
@@ -53,7 +56,13 @@ const askToDeleteCredentials = async () => {
 
 const viewAllCredentials = () => {
     const userCredentials = getCredentials();
+
+    if(!userCredentials.length){
+      logger.info('User has not credentials, cannot see an empty list');
+    }
     userCredentials.forEach(cred => cred.print());
+
+
 };
 
 
