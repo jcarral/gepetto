@@ -10,7 +10,8 @@ module.exports = {
     DELETE_CREDENTIALS_OPT: 'delete',
     ADD_CREDENTIALS_OPT: 'add',
     BACK_OPT: 'back',
-    DELETE: 'delete'
+    DELETE: 'delete',
+    OPEN_FILE: 'openFile'
   },
   MENU: {
     NAME : 'menu',

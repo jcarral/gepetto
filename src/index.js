@@ -86,6 +86,10 @@ const printManageCredentialsMenu = async (hideHeader) => {
     case CREDENTIALS.BACK_OPT:
       await printMainMenu();
       break;
+    case CREDENTIALS.OPEN_FILE:
+      await CredentialsService.openCredentialsFile();
+      await printManageCredentialsMenu();
+      break;
     default:
       break;
   }
