@@ -21,6 +21,10 @@ const ManageCredentialsQuestions = [
         value: CREDENTIALS.DELETE_CREDENTIALS_OPT
       },
       {
+        name: 'Open credentials file',
+        value: CREDENTIALS.OPEN_FILE
+      },
+      {
         name: 'Back',
         value: CREDENTIALS.BACK_OPT
       },

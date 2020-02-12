@@ -1,3 +1,4 @@
+const open = require('open');
 const {
   CredentialsQuestions
 } = require('../questions');
@@ -9,7 +10,8 @@ const {
   hasCredentials,
   addCredentials,
   getCredentials,
-  removeCredentials
+  removeCredentials,
+  getFilePath
 } = require('../config/credentials.config');
 const {
   QuestionConstants
@@ -65,11 +67,29 @@ const viewAllCredentials = () => {
 
 };
 
+const openCredentialsFile = async () => {
+
+  try {
+    const path = getFilePath();
+
+    if(path && path.length) {
+      await open(path);
+    } else {
+      logger.warn(`Invalid credentials file path: ${path}`);
+    }
+  } catch(e) {
+    console.log(' Cannot open file ');
+    logger.error(e);
+  }
+
+
+};
 
 module.exports = {
   askForCredentials,
   askToDeleteCredentials,
   viewAllCredentials,
   hasCredentials,
-  getCredentials
+  getCredentials,
+  openCredentialsFile
 }
