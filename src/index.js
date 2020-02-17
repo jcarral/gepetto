@@ -24,7 +24,7 @@ const {
 } = require('./questions');
 
 const { CredentialsService, JiraService, ExportService, UpdatesService, } = require('./services');
-const { printHeader, logger } = require('./helpers');
+const { printHeader, logger, Notify } = require('./helpers');
 
 
 const printBoardMenu = async selectedBoard => {
@@ -122,6 +122,7 @@ const printMainMenu = async (hideHeader) => {
 
 //Init
 (async () => {
+
   try {
     printHeader();
     logger.info('Starting GePetto');

@@ -2,10 +2,8 @@ const ExcelJS = require('exceljs');
 const open = require('open');
 const fs = require('fs');
 const path = require('path');
-const Box = require("cli-box");
-const chalk = require('chalk');
 
-const { printHeader, logger } = require('../helpers');
+const { printHeader, logger, Notify } = require('../helpers');
 
 
 const ISSUE_COLUMNS = [{
@@ -50,36 +48,16 @@ const LOGS_COLUMNS = [{
   },
 ];
 
-//TODO: Move to logs/Report service
 const drawSuccessBox = () => {
   printHeader();
-  const boxToDraw = Box("35x2", {
-    text: "🤘 Your report has been created 🤘 ",
-    stretch: true,
-    autoEOL: true,
-    vAlign: "top",
-    hAlign: "center"
-  });
-  console.log(chalk.green(boxToDraw));
-
+  Notify.success("🤘 Your report has been created 🤘 ");
 };
 
-//TODO: Move to logs/Report service
 const drawErrorCreating = err => {
   printHeader();
   logger.error(err);
-  const boxToDraw = Box("35x2", {
-    text: "👺 Error creating your report 👺 ",
-    stretch: true,
-    autoEOL: true,
-    vAlign: "top",
-    hAlign: "center"
-  });
-  console.log(chalk.red(boxToDraw));
-
+  Notify.error("👺 Error creating your report 👺 ");
 }
-
-
 
 const createFileFromWb = async (wb, fileName, type = 'xlsx') => {
   const fileDirPath = path.join(__basedir, '/tmp/exports');

@@ -1,10 +1,10 @@
 const request = require('request');
 const path = require('path');
-const Box = require("cli-box");
-const chalk = require('chalk');
 const {
   Spinner
 } = require('clui');
+
+const { Notify } = require('../helpers');
 
 const packagejson = require(path.join(__basedir, 'package.json'));
 
@@ -104,14 +104,7 @@ const checkForUpdates = async () => {
     if(await hasExpired(versions)) {
       updateSpinner.stop(); //Stop before drawing box
 
-      const boxToDraw = Box("35x2", {
-        text: "🤘 New update is available, you should update it 🤘 \n $ npm update -g gepetto",
-        stretch: true,
-        autoEOL: true,
-        vAlign: "top",
-        hAlign: "center"
-      });
-      console.log(chalk.yellow(boxToDraw));
+      Notify.warn("🤘 New update is available, you should update it 🤘 \n $ npm update -g gepetto")
     }
   } catch(e) {
     console.log('Error checking', e)
