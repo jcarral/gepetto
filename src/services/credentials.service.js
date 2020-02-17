@@ -1,3 +1,4 @@
+const open = require('open');
 const {
   CredentialsQuestions
 } = require('../questions');
@@ -9,7 +10,8 @@ const {
   hasCredentials,
   addCredentials,
   getCredentials,
-  removeCredentials
+  removeCredentials,
+  getFilePath
 } = require('../config/credentials.config');
 const {
   QuestionConstants
@@ -17,6 +19,7 @@ const {
 const {
   CREDENTIALS
 } = QuestionConstants;
+const { logger } = require('../helpers');
 
 const askForCredentials = async () => {
 
@@ -25,6 +28,7 @@ const askForCredentials = async () => {
   const cred = new Credentials(answerCred);
 
   if (cred.isValid()) {
+    logger.warn(`Invalid credentials ${cred}`);
     addCredentials(cred);
   }
 };
@@ -32,6 +36,7 @@ const askForCredentials = async () => {
 //TODO: Check if is empty and force user to add or close app
 //TODO: After deleting credentials check again if is empty
 const askToDeleteCredentials = async () => {
+
   const storedCredentials = getCredentials();
 
   const choices = storedCredentials.map(cred => ({
@@ -53,14 +58,38 @@ const askToDeleteCredentials = async () => {
 
 const viewAllCredentials = () => {
     const userCredentials = getCredentials();
+
+    if(!userCredentials.length){
+      logger.info('User has not credentials, cannot see an empty list');
+    }
     userCredentials.forEach(cred => cred.print());
+
+
 };
 
+const openCredentialsFile = async () => {
+
+  try {
+    const path = getFilePath();
+
+    if(path && path.length) {
+      await open(path);
+    } else {
+      logger.warn(`Invalid credentials file path: ${path}`);
+    }
+  } catch(e) {
+    console.log(' Cannot open file ');
+    logger.error(e);
+  }
+
+
+};
 
 module.exports = {
   askForCredentials,
   askToDeleteCredentials,
   viewAllCredentials,
   hasCredentials,
-  getCredentials
+  getCredentials,
+  openCredentialsFile
 }

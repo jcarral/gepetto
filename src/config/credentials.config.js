@@ -37,10 +37,13 @@ const removeCredentials = key => {
   config.set(ConfigConstants.CONFIG_CREDENTIAlS, credentialsWithoutTarget);
 };
 
+const getFilePath = config.path;
+
 
 module.exports = {
     getCredentials,
     hasCredentials,
     addCredentials,
-    removeCredentials
+    removeCredentials,
+    getFilePath
 };

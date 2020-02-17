@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+//Set global basedir variable
+global.__basedir = __dirname + "/..";
+
 const {
   QuestionConstants
 } = require('./constants/');
@@ -19,16 +23,15 @@ const {
   CredentialsQuestions
 } = require('./questions');
 
-const { CredentialsService, JiraService, ExportService, } = require('./services');
-const { printHeader } = require('./helpers');
+const { CredentialsService, JiraService, ExportService, UpdatesService, } = require('./services');
+const { printHeader, logger, Notify } = require('./helpers');
 
-//Set global basedir variable
-global.__basedir = __dirname + "/..";
 
 const printBoardMenu = async selectedBoard => {
   const loadedBoardAction = new Action(BoardQuestions.LoadedBoard);
   const loadedBoardActionAnswer = await loadedBoardAction.ask();
-//
+
+  logger.info(`[BOARD] User selected: ${JSON.stringify(loadedBoardActionAnswer)}`)
   switch (loadedBoardActionAnswer[BOARD.LOADED_BOARD]) {
     case BOARD.VIEW_USERS:
       JiraService.showBoardUsers(selectedBoard);
@@ -65,6 +68,7 @@ const printManageCredentialsMenu = async (hideHeader) => {
   const manageCredentialsAction = new Action(CredentialsQuestions.ManageCredentialsQuestions);
   const manageCredentialsAnswer = await manageCredentialsAction.ask();
 
+  logger.info(`[CREDENTIALS] User selected: ${JSON.stringify(manageCredentialsAnswer)}`);
   switch (manageCredentialsAnswer[CREDENTIALS.MANAGE_CREDENTIALS]) {
 
     case CREDENTIALS.VIEW_CREDENTIALS_OPT:
@@ -82,16 +86,24 @@ const printManageCredentialsMenu = async (hideHeader) => {
     case CREDENTIALS.BACK_OPT:
       await printMainMenu();
       break;
+    case CREDENTIALS.OPEN_FILE:
+      await CredentialsService.openCredentialsFile();
+      await printManageCredentialsMenu();
+      break;
     default:
       break;
   }
 
 };
-const printMainMenu = async () => {
-  printHeader();
+const printMainMenu = async (hideHeader) => {
+
+  if(!hideHeader){
+    printHeader();
+  }
   const menuAction = new Action(MenuQuestions.Main)
   const menuActionAnswer = await menuAction.ask();
 
+  logger.info(`[MAIN] User selected: ${JSON.stringify(menuActionAnswer)}`)
   switch (menuActionAnswer[MENU.NAME]) {
     case MENU.MANAGE_CREDENTIALS_OPT:
       return await printManageCredentialsMenu();
@@ -99,6 +111,7 @@ const printMainMenu = async () => {
       const selectedBoard = await JiraService.loadBoard();
       return await printBoardMenu(selectedBoard);
     case MENU.CLOSE_OPT:
+      logger.info('Closing manually');
       return process.exit(1);
     default:
       return;
@@ -110,14 +123,22 @@ const printMainMenu = async () => {
 //Init
 (async () => {
 
-  printHeader();
+  try {
+    printHeader();
+    logger.info('Starting GePetto');
+    await UpdatesService.checkForUpdates();
 
-  //await checkForUpdates();
+    logger.info('Updates checked!');
 
-  if (!CredentialsService.hasCredentials()) {
-    await CredentialsService.askForCredentials();
+    if (!CredentialsService.hasCredentials()) {
+      logger.info('User first login');
+      await CredentialsService.askForCredentials();
+    }
+
+    await printMainMenu(true);
+  } catch(e) {
+    logger.error(e);
   }
 
-  await printMainMenu();
 
 })();

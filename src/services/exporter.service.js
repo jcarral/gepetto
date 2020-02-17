@@ -2,10 +2,8 @@ const ExcelJS = require('exceljs');
 const open = require('open');
 const fs = require('fs');
 const path = require('path');
-const Box = require("cli-box");
-const chalk = require('chalk');
 
-const { printHeader } = require('../helpers');
+const { printHeader, logger, Notify } = require('../helpers');
 
 
 const ISSUE_COLUMNS = [{
@@ -50,34 +48,16 @@ const LOGS_COLUMNS = [{
   },
 ];
 
-//TODO: Move to logs/Report service
 const drawSuccessBox = () => {
   printHeader();
-  const boxToDraw = Box("35x2", {
-    text: "🤘 Your report has been created 🤘 ",
-    stretch: true,
-    autoEOL: true,
-    vAlign: "top",
-    hAlign: "center"
-  });
-  console.log(chalk.green(boxToDraw));
+  Notify.success("🤘 Your report has been created 🤘 ");
 };
 
-//TODO: Move to logs/Report service
 const drawErrorCreating = err => {
   printHeader();
-  console.error(err);
-  const boxToDraw = Box("35x2", {
-    text: "👺 Error creating your report 👺 ",
-    stretch: true,
-    autoEOL: true,
-    vAlign: "top",
-    hAlign: "center"
-  });
-  console.log(chalk.red(boxToDraw));
+  logger.error(err);
+  Notify.error("👺 Error creating your report 👺 ");
 }
-
-
 
 const createFileFromWb = async (wb, fileName, type = 'xlsx') => {
   const fileDirPath = path.join(__basedir, '/tmp/exports');
@@ -90,6 +70,7 @@ const createFileFromWb = async (wb, fileName, type = 'xlsx') => {
   const fullPathFile = path.join(fileDirPath, `${fileName}.${type}`)
 
   await wb.xlsx.writeFile(fullPathFile);
+  logger.info(`File created at: ${fullPathFile}`);
   return fullPathFile;
 };
 
