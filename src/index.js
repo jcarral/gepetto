@@ -130,11 +130,6 @@ const printMainMenu = async (hideHeader) => {
 
     logger.info('Updates checked!');
 
-    if (!CredentialsService.hasCredentials()) {
-      logger.info('User first login');
-      await CredentialsService.askForCredentials();
-    }
-
     await printMainMenu(true);
   } catch(e) {
     logger.error(e);
