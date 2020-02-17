@@ -66,7 +66,6 @@ const getBoard = async board => {
   const boardSpinner = new Spinner('Loading board');
   boardSpinner.start();
   const loadedBoard = await client.getBoard(board.credentials.board);
-  logger.info(JSON.stringify(loadedBoard))
   boardSpinner.stop();
   board.jiraBoard = loadedBoard;
   return board;
