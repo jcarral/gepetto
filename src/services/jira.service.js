@@ -11,7 +11,6 @@ const {
   BoardQuestions
 } = require('../questions');
 const {
-  Credentials,
   Action,
   Board
 } = require('../models');
@@ -22,14 +21,13 @@ const {
 const {
   BOARD
 } = QuestionConstants;
-const CredentialsService = require('../services/credentials.service');
+const ConfigService = require('./config.service');
 const { logger } = require('../helpers');
 
 
-//TODO: Force user to add Credentials or close if there are not
-const askToSelectBoard = async () => {
+  const askToSelectBoard = async () => {
   let selectBoardAction = new Action(BoardQuestions.Main);
-  const storedCredentials = CredentialsService.getCredentials();
+  const storedCredentials = ConfigService.getCredentials();
 
   if(!storedCredentials.length) {
     console.log('You cannot select a board without credentials, you must add them before trying to get a board');

@@ -5,9 +5,10 @@ const Store = require('./store');
 const { ConfigConstants } = require('../constants');
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-
+const googleStore = new Store(ConfigConstants.GOOGLE_AUTH_STORE);
 
 const getToken = async (client) => {
+
   const authUrl = client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
@@ -22,23 +23,30 @@ const getToken = async (client) => {
   const code = await rl.question('Enter the code from that page here: ');
   rl.close();
   const token = await client.getToken(code);
-  Store.set(ConfigConstants.GOOGLE_AUTH_TOKEN, token);
+  googleStore.set(ConfigConstants.GOOGLE_AUTH_TOKEN, token);
   return token;
 };
 
 //TODO: CHECK IF CREDENTIALS ARE STORED FIRST
 const getClient = async () => {
-  const { client_secret, client_id, redirect_uris } = Store.get(ConfigConstants.GOOGLE_AUTH_CREDENTIALS);
-  let token = Store.get(ConfigConstants.GOOGLE_AUTH_TOKEN);
 
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+  if(googleStore.has(ConfigConstants.GOOGLE_AUTH_CREDENTIALS)) {
+    const { client_secret, client_id, redirect_uris } = googleStore.get(ConfigConstants.GOOGLE_AUTH_CREDENTIALS);
+    let token = googleStore.get(ConfigConstants.GOOGLE_AUTH_TOKEN);
 
-  if(!token || !token.length) {
-    token = await getToken(oAuth2Client);
+    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
+    if(!token || !token.length) {
+      token = await getToken(oAuth2Client);
+    }
+
+    oAuth2Client.setCredentials(token);
+    return oAuth2Client;
+
+  } else {
+    //TODO: ASK USER TO ADD CREDENTIALS
+    // MESSAGE TO DOCS
   }
-
-  oAuth2Client.setCredentials(token);
-  return oAuth2Client;
 
 };
 

@@ -2,7 +2,7 @@ const chalk = require('chalk');
 
 const isBlank = str => !str || str.length === 0;
 
-class Credentials {
+class JiraCredentials {
 
     constructor(data = {}) {
         const { token, password, username,  host, board, displayName} = data;
@@ -23,8 +23,8 @@ class Credentials {
     }
 
     print(){
-      console.log(chalk.magenta(`👨‍💼 [${this.board}] - ${this.displayName}`))
+      console.log(`${chalk.bgYellow.magenta(`[${this.board}]`)} ${chalk.cyan(`- ${this.displayName}`)}`);
     }
 }
 
-module.exports = Credentials;
+module.exports = JiraCredentials;

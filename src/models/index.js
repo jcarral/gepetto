@@ -1,6 +1,6 @@
 const Action = require('./Action');
-const Credentials = require('./Credentials');
+const JiraCredentials = require('./JiraCredentials');
 const Board = require('./Board');
 
 
-module.exports = { Action, Credentials, Board }
+module.exports = { Action, JiraCredentials, Board }

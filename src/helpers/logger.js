@@ -3,7 +3,7 @@ const { combine, timestamp, label, printf } = format;
 const path = require('path');
 
 const logFormat = printf(({ level, message, label, timestamp }) => {
-  return `${timestamp} [${level}]: ${message}`;
+  return `${timestamp} [${level.toUpperCase()}]: ${message}`;
 });
 
 const logger = createLogger({

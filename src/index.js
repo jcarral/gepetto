@@ -4,27 +4,26 @@
 global.__basedir = __dirname + "/..";
 
 const {
-  QuestionConstants
+  QuestionConstants, ConfigConstants
 } = require('./constants/');
 const {
-  CREDENTIALS,
+  CONFIG,
   MENU,
   BOARD
 } = QuestionConstants;
 
 const {
-  Action,
-  Credentials
+  Action
 } = require('./models/');
 
 const {
   MenuQuestions,
   BoardQuestions,
-  CredentialsQuestions
+  ConfigQuestions
 } = require('./questions');
 
-const { CredentialsService, JiraService, ExportService, UpdatesService, } = require('./services');
-const { printHeader, logger, Notify } = require('./helpers');
+const { ConfigService, JiraService, ExportService, UpdatesService, } = require('./services');
+const { printHeader, logger } = require('./helpers');
 
 
 const printBoardMenu = async selectedBoard => {
@@ -59,36 +58,40 @@ const printBoardMenu = async selectedBoard => {
   }
 
 };
-const printManageCredentialsMenu = async (hideHeader) => {
+const printConfigMenu = async (hideHeader) => {
 
   if (!hideHeader) {
     printHeader();
   }
+  logger.info('Printing config menu');
+  const configMenuAction = new Action(ConfigQuestions.MainConfigMenuQuestions);
+  const configMenuAnswer = await configMenuAction.ask();
 
-  const manageCredentialsAction = new Action(CredentialsQuestions.ManageCredentialsQuestions);
-  const manageCredentialsAnswer = await manageCredentialsAction.ask();
+  logger.info(`[CONFIG] User selected: ${JSON.stringify(configMenuAnswer)}`);
+  switch (configMenuAnswer[CONFIG.MENU]) {
 
-  logger.info(`[CREDENTIALS] User selected: ${JSON.stringify(manageCredentialsAnswer)}`);
-  switch (manageCredentialsAnswer[CREDENTIALS.MANAGE_CREDENTIALS]) {
-
-    case CREDENTIALS.VIEW_CREDENTIALS_OPT:
-      CredentialsService.viewAllCredentials();
-      await printManageCredentialsMenu(true);
+    case CONFIG.VIEW_CREDENTIALS_OPT:
+      ConfigService.viewAllCredentials();
+      await printConfigMenu(true);
       break;
-    case CREDENTIALS.ADD_CREDENTIALS_OPT:
-      await CredentialsService.askForCredentials();
-      await printManageCredentialsMenu();
+    case CONFIG.ADD_CREDENTIALS_OPT:
+      await ConfigService.askForCredentials();
+      await printConfigMenu();
       break;
-    case CREDENTIALS.DELETE_CREDENTIALS_OPT:
-      await CredentialsService.askToDeleteCredentials();
-      await printManageCredentialsMenu();
+    case CONFIG.DELETE_CREDENTIALS_OPT:
+      await ConfigService.askToDeleteCredentials();
+      await printConfigMenu();
       break;
-    case CREDENTIALS.BACK_OPT:
+    case CONFIG.BACK_OPT:
       await printMainMenu();
       break;
-    case CREDENTIALS.OPEN_FILE:
-      await CredentialsService.openCredentialsFile();
-      await printManageCredentialsMenu();
+    case CONFIG.OPEN_FILE:
+      await ConfigService.openConfigFile();
+      await printConfigMenu();
+      break;
+    case CONFIG.OPEN_GOOGLE_FILE:
+      await ConfigService.openConfigFile(ConfigConstants.GOOGLE_AUTH_STORE);
+      await printConfigMenu(true);
       break;
     default:
       break;
@@ -105,8 +108,8 @@ const printMainMenu = async (hideHeader) => {
 
   logger.info(`[MAIN] User selected: ${JSON.stringify(menuActionAnswer)}`)
   switch (menuActionAnswer[MENU.NAME]) {
-    case MENU.MANAGE_CREDENTIALS_OPT:
-      return await printManageCredentialsMenu();
+    case MENU.CONFIG_OPT:
+      return await printConfigMenu();
     case MENU.BOARDS_OPT:
       const selectedBoard = await JiraService.loadBoard();
       return await printBoardMenu(selectedBoard);
@@ -132,7 +135,7 @@ const printMainMenu = async (hideHeader) => {
 
     await printMainMenu(true);
   } catch(e) {
-    logger.error(e);
+    logger.error('Internal error: ', e);
   }
 
 
