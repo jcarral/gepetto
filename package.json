@@ -24,6 +24,7 @@
     "configstore": "^5.0.0",
     "exceljs": "^3.7.0",
     "figlet": "^1.2.4",
+    "googleapis": "^39.2.0",
     "inquirer": "^7.0.4",
     "inquirer-datepicker-prompt": "^0.4.2",
     "jest": "^25.1.0",
