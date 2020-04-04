@@ -9,11 +9,11 @@ class Board {
     }
 
     getIssues(queryParams){
-      return this.jiraBoard ? this.jiraBoard.getIssues(queryParams) : []
+      return this.jiraBoard ? this.jiraBoard.getIssues(queryParams) : [];
     }
 
     getLogs(queryParams){
-      return this.jiraBoard ? this.jiraBoard.getLogsByDay(queryParams) : []
+      return this.jiraBoard ? this.jiraBoard.getLogsByDay(queryParams) : [];
     }
 }
 

@@ -1,21 +1,33 @@
 const Configstore = require('configstore');
+const { ConfigConstants } = require('../constants');
+const { logger } = require('../helpers');
 
-const config = new Configstore('ds');
+class Store {
+  constructor(name = ConfigConstants.DEFAULT_STORE){
+    this.config = new Configstore(name, {fileName: name});
+  }
 
-const get = key => {
-    return config.get(key);
-}; 
+  get(key){
+    return this.config.has(key) ? this.config.get(key) : null;
+  }
 
-const set = (key, value) => {
-    config.set(key, value);
-};
+  set(key, value){
+    this.config.set(key, value);
+  }
 
-const remove = key => {
-    config.delete(key);
-};
+  remove(key){
+    if(this.config.has(key)){
+      this.config.delete(key);
+    }
+  }
 
-module.exports = {
-    get,
-    set,
-    remove
-};
+  has(key) {
+    return this.config.has(key);
+  }
+
+  path(){
+    return this.config.path;
+  }
+}
+
+module.exports = Store;

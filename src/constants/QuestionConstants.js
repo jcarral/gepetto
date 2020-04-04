@@ -1,22 +1,26 @@
 module.exports = {
-  CREDENTIALS : {
+  CONFIG : {
     ADD_DISPLAY_NAME : 'displayName',
     ADD_USERNAME : 'username',
     ADD_HOST : 'host',
     ADD_TOKEN : 'token',
     ADD_BOARD : 'board',
-    MANAGE_CREDENTIALS: 'manage',
+    MENU: 'configMenu',
     VIEW_CREDENTIALS_OPT: 'view',
     DELETE_CREDENTIALS_OPT: 'delete',
     ADD_CREDENTIALS_OPT: 'add',
     BACK_OPT: 'back',
-    DELETE: 'delete'
+    DELETE: 'delete',
+    OPEN_FILE: 'openFile',
+    OPEN_GOOGLE_FILE: 'openGoogleFile',
   },
   MENU: {
     NAME : 'menu',
     CLOSE_OPT: 'close',
-    MANAGE_CREDENTIALS_OPT: 'manageCredentials',
-    BOARDS_OPT: 'boards'
+    CONFIG_OPT: 'configOpt',
+    BOARDS_OPT: 'jiraBoards',
+    CAL_OPT: 'calendar'
+
   },
   BOARD: {
     MAIN: 'selectBoard',

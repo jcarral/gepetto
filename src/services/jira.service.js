@@ -11,7 +11,6 @@ const {
   BoardQuestions
 } = require('../questions');
 const {
-  Credentials,
   Action,
   Board
 } = require('../models');
@@ -22,13 +21,18 @@ const {
 const {
   BOARD
 } = QuestionConstants;
-const CredentialsService = require('../services/credentials.service');
+const ConfigService = require('./config.service');
+const { logger } = require('../helpers');
 
 
-//TODO: Force user to add Credentials or close if there are not
-const askToSelectBoard = async () => {
+  const askToSelectBoard = async () => {
   let selectBoardAction = new Action(BoardQuestions.Main);
-  const storedCredentials = CredentialsService.getCredentials();
+  const storedCredentials = ConfigService.getCredentials();
+
+  if(!storedCredentials.length) {
+    console.log('You cannot select a board without credentials, you must add them before trying to get a board');
+    return logger.warn('User is trying to get a board without credentials');
+  }
 
   const choices = storedCredentials.map(cred => ({
     name: cred.displayName,
@@ -42,13 +46,16 @@ const askToSelectBoard = async () => {
   let selectedBoard = null;
 
   if (selectedCredentials) {
-    selectedBoard = new Board(selectedCredentials, null);
+    return new Board(selectedCredentials, null);
+  } else {
+    console.log('You must select one board');
+    logger.warn('User did not select a board')
   }
-
-  return selectedBoard;
 }
 
 const getBoard = async board => {
+  logger.info(`Trying to load board : ${board.credentials.board}`);
+
   const client = new JiraClient({
     host: board.credentials.host,
     username: board.credentials.username,
@@ -98,7 +105,7 @@ const doAskForBoardIssues = async board => {
 
 
   let answer = await askIssuesAction.ask();
-  if (answer[BOARD.AUTHOR] && !answer[BOARD.AUTHOR].length) {
+  if (!answer[BOARD.AUTHOR] || !answer[BOARD.AUTHOR].length) {
     delete answer[BOARD.AUTHOR];
   }
   answer.first = answer.first.toISOString().split('T')[0];
@@ -107,8 +114,8 @@ const doAskForBoardIssues = async board => {
 };
 
 const askForIssues = async board => {
-
   const answer = await doAskForBoardIssues(board);
+  logger.info(`Issues queryParams ${JSON.stringify(answer)}`);
   const issues = board.getIssues(answer);
   return issues;
 
@@ -116,6 +123,7 @@ const askForIssues = async board => {
 
 const askForLogs = async board => {
   const answer = await doAskForBoardIssues(board);
+  logger.info(`Logs queryParams ${JSON.stringify(answer)}`);
   const logs = board.getLogs(answer);
   return logs;
 }

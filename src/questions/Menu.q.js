@@ -12,12 +12,16 @@ const Main = [{
   choices: [
     {
       name: 'Manage credentials',
-      value: MENU.MANAGE_CREDENTIALS_OPT
+      value: MENU.CONFIG_OPT
     },
     {
-      name: 'Select board',
-      //disabled: 'Unavailable at this time',
+      name: 'Select Jira board',
       value: MENU.BOARDS_OPT
+    },
+    {
+      name: 'Manage your calendar',
+      value: MENU.CAL_OPT,
+      disabled: 'Not available yet'
     },
     {
       name: 'Close',
