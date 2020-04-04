@@ -17,6 +17,16 @@ const ISSUE_COLUMNS = [{
     width: 32
   },
   {
+    header: 'Type',
+    key: 'type',
+    width: 32
+  },
+  {
+    header: 'Title',
+    key: 'title',
+    width: 32
+  },
+  {
     header: 'Time',
     key: 'time',
     width: 10
@@ -122,7 +132,9 @@ const exportIssues = async (issues, type = 'xlsx') => {
           issue: issue.name,
           author: wl.author.name,
           time: wl.time.getHours(),
-          date: wl.created,
+          date: wl.started,
+          type: issue.issuetype.name,
+          title: issue.summary
         };
         sheet.addRow(row);
       });
